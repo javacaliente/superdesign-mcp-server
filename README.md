@@ -34,7 +34,7 @@ npm run build
      "mcpServers": {
        "superdesign": {
          "command": "node",
-         "args": ["C:\\Files\\Documents\\Cline\\superdesign-mcp-server\\dist\\index.js"],
+         "args": ["path/to/your/superdesign-mcp-server/dist/index.js"],
          "env": {}
        }
      }
@@ -42,7 +42,7 @@ npm run build
    ```
 
 3. **Alternative: Use the provided config file:**
-   Copy the `mcp-config.json` file from this project to your Cline configuration directory
+   Copy the `cline-mcp-config.json` file from this project to your Cline configuration directory
 
 4. **Restart Cline**
 
