@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "superdesign": {
-      "command": "node",
-      "args": ["C:\\Files\\Documents\\Cline\\superdesign-mcp-server\\dist\\index.js"],
-      "env": {}
-    }
-  }
-}
