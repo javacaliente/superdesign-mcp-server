@@ -1931,7 +1931,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "superdesign_generate",
-        description: "Returns design specifications for Claude Code to generate UI designs, wireframes, components, logos, or icons",
+        description: "Returns design specifications for Cline to generate UI designs, wireframes, components, logos, or icons",
         inputSchema: {
           type: "object",
           properties: {
@@ -2093,7 +2093,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
         
         // Build design specifications
-        let specifications = `DESIGN SPECIFICATION FOR CLAUDE CODE:
+        let specifications = `DESIGN SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must generate and save the following design files based on these specifications.
 
@@ -2159,7 +2159,7 @@ Please proceed to create these ${variations} design files now, then automaticall
           fileList.push(`${baseName}_${i}.${extension}`);
         }
         
-        let specifications = `DESIGN ITERATION SPECIFICATION FOR CLAUDE CODE:
+        let specifications = `DESIGN ITERATION SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must iterate on the existing design and save the improved versions.
 
@@ -2211,7 +2211,7 @@ Please proceed to create these ${variations} improved design files now.`;
         const superdesignDir = getSuperdeignDirectory();
         const designSystemDir = path.join(superdesignDir, 'design_system');
         
-        let specifications = `DESIGN SYSTEM EXTRACTION SPECIFICATION FOR CLAUDE CODE:
+        let specifications = `DESIGN SYSTEM EXTRACTION SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must analyze the image and extract a design system JSON file.
 
@@ -2333,7 +2333,7 @@ Please proceed to analyze the image and create the design system JSON file now.`
           // Generate gallery HTML
           const galleryHtml = generateGalleryHTML(designFiles, superdesignDir);
           
-          let specifications = `GALLERY GENERATION SPECIFICATION FOR CLAUDE CODE:
+          let specifications = `GALLERY GENERATION SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must create a gallery HTML file to view all designs in a browser.
 
