@@ -41,8 +41,8 @@ npm run build
    }
    ```
 
-3. **Alternative: Use the provided config file:**
-   Copy the `cline-mcp-config.json` file from this project to your Cline configuration directory
+3. **Alternative: Use the provided template:**
+   Copy `cline-mcp-config.template.json` to `cline-mcp-config.json` and update the path to match your installation
 
 4. **Restart Cline**
 
