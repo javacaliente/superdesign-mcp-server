@@ -1,6 +1,6 @@
 # Superdesign MCP Server for Cline
 
-An MCP (Model Context Protocol) server that brings [Superdesign](https://github.com/superdesigndev/superdesign) - an open source AI design agent by [@jasonzhou1993](https://twitter.com/jasonzhou1993) and [@jackjack_eth](https://twitter.com/jackjack_eth) - to Cline as native tools. This Cline version was originally from [superdesign-mcp-claude-code](https://github.com/jonthebeef/superdesign-mcp-claude-code). Currently the main difference was updating Claude Code references to Cline. And updateing the Read Me to include more details about the project. This server operates as a "design orchestrator" that provides structured specifications for Cline to execute, enabling Superdesign's sophisticated design capabilities without requiring separate API keys.
+An MCP (Model Context Protocol) server that brings [Superdesign](https://github.com/superdesigndev/superdesign) - an open source AI design agent by [@jasonzhou1993](https://twitter.com/jasonzhou1993) and [@jackjack_eth](https://twitter.com/jackjack_eth) - to Cline as native tools. This Cline version was originally from [superdesign-mcp-claude-code](https://github.com/jonthebeef/superdesign-mcp-claude-code). Currently the main difference was updating Claude Code references to Cline. And updating the Read Me to include more details about the project. This server operates as a "design orchestrator" that provides structured specifications for Cline to execute, enabling Superdesign's sophisticated design capabilities without requiring separate API keys.
 
 ## Key Benefits
 
