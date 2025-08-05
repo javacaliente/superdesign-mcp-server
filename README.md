@@ -1,12 +1,12 @@
 # Superdesign MCP Server
 
-An MCP (Model Context Protocol) server that brings [Superdesign](https://github.com/superdesigndev/superdesign) - an open source AI design agent by [@jasonzhou1993](https://twitter.com/jasonzhou1993) and [@jackjack_eth](https://twitter.com/jackjack_eth) - to Claude Code as native tools. This server operates as a "design orchestrator" that provides structured specifications for your IDE's LLM to execute, enabling Superdesign's sophisticated design capabilities without requiring Anthropic API keys.
+An MCP (Model Context Protocol) server that brings [Superdesign](https://github.com/superdesigndev/superdesign) - an open source AI design agent by [@jasonzhou1993](https://twitter.com/jasonzhou1993) and [@jackjack_eth](https://twitter.com/jackjack_eth) - to Cline and other MCP-compatible IDEs as native tools. This server operates as a "design orchestrator" that provides structured specifications for your IDE's LLM to execute, enabling Superdesign's sophisticated design capabilities without requiring Anthropic API keys.
 
 ## Key Benefits
 
-- **No API Keys Required**: Works directly with Claude Code's built-in LLM connection
+- **No API Keys Required**: Works directly with your IDE's built-in LLM connection
 - **Local Execution**: Runs entirely on your machine as an MCP server
-- **IDE Integration**: Seamlessly integrates with Claude Code (and potentially Cursor, Windsurf, or other MCP-compatible IDEs - untested)
+- **IDE Integration**: Seamlessly integrates with Cline, Claude Code, Cursor, Windsurf, and other MCP-compatible IDEs
 - **Based on Open Source**: Built on top of [Superdesign.dev](https://www.superdesign.dev), an open source AI design system
 
 ## Installation
@@ -20,6 +20,40 @@ npm install
 ```bash
 npm run build
 ```
+
+## Cline Integration
+
+1. **Locate your Cline MCP configuration file:**
+   - On Windows: `%APPDATA%\Cline\mcp_servers.json` or similar
+   - The exact location may vary depending on your Cline installation
+
+2. **Add the MCP server configuration:**
+   Edit your Cline MCP configuration file to include:
+   ```json
+   {
+     "mcpServers": {
+       "superdesign": {
+         "command": "node",
+         "args": ["C:\\Files\\Documents\\Cline\\superdesign-mcp-server\\dist\\index.js"],
+         "env": {}
+       }
+     }
+   }
+   ```
+
+3. **Alternative: Use the provided config file:**
+   Copy the `mcp-config.json` file from this project to your Cline configuration directory
+
+4. **Restart Cline**
+
+3. The MCP server will provide these Superdesign orchestrator tools in Cline:
+   - `superdesign_generate` - Returns specifications for Cline to generate designs
+   - `superdesign_iterate` - Returns instructions for Cline to iterate on existing designs
+   - `superdesign_extract_system` - Returns instructions for design system extraction
+   - `superdesign_list` - Lists all created designs in the workspace
+   - `superdesign_gallery` - Generate interactive HTML gallery
+   - `superdesign_cleanup` - Clean up old design files
+   - `superdesign_live_gallery` - Start live gallery server
 
 ## Claude Code Integration
 
@@ -39,7 +73,7 @@ Example `~/.claude-code/mcp-settings.json`:
   "mcpServers": {
     "superdesign": {
       "command": "node",
-      "args": ["/path/to/superdesign/dist/index.js"],
+      "args": ["C:\\Files\\Documents\\Cline\\superdesign-mcp-server\\dist\\index.js"],
       "env": {}
     }
   }
