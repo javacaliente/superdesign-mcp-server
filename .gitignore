@@ -16,6 +16,7 @@ dist/
 
 # Personal configuration files
 cline-mcp-config.json
+path_explanation.txt
 
 # IDE files
 .vscode/

@@ -74,8 +74,7 @@ const CheckFilesSchema = z.object({
 
 // Get or create superdesign directory
 function getSuperdeignDirectory(workspacePath?: string): string {
-  const basePath = workspacePath || process.cwd();
-  const superdesignDir = path.join(basePath, 'superdesign');
+  const superdesignDir = workspacePath || process.env.SUPERDESIGN_WORKSPACE || process.cwd();
   
   if (!existsSync(superdesignDir)) {
     mkdirSync(superdesignDir, { recursive: true });
@@ -282,9 +281,16 @@ function performCleanup(superdesignDir: string, maxAgeDays?: number, maxCount?: 
   return { deleted, kept, errors };
 }
 
-// Generate base filename from prompt
+// Generate base filename from prompt with date prefix
 function generateBaseName(prompt: string): string {
-  return prompt.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const datePrefix = `${year}.${month}.${day}_`;
+  
+  const cleanPrompt = prompt.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+  return `${datePrefix}${cleanPrompt}`;
 }
 
 // File checking for smart refresh integration

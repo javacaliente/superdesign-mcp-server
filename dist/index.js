@@ -57,8 +57,7 @@ const CheckFilesSchema = z.object({
 });
 // Get or create superdesign directory
 function getSuperdeignDirectory(workspacePath) {
-    const basePath = workspacePath || process.cwd();
-    const superdesignDir = path.join(basePath, 'superdesign');
+    const superdesignDir = workspacePath || process.env.SUPERDESIGN_WORKSPACE || process.cwd();
     if (!existsSync(superdesignDir)) {
         mkdirSync(superdesignDir, { recursive: true });
     }
@@ -222,9 +221,15 @@ function performCleanup(superdesignDir, maxAgeDays, maxCount, dryRun = false) {
     }
     return { deleted, kept, errors };
 }
-// Generate base filename from prompt
+// Generate base filename from prompt with date prefix
 function generateBaseName(prompt) {
-    return prompt.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const datePrefix = `${year}.${month}.${day}_`;
+    const cleanPrompt = prompt.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+    return `${datePrefix}${cleanPrompt}`;
 }
 function checkFileChanges(superdesignDir, manifest) {
     const designIterationsDir = path.join(superdesignDir, 'design_iterations');
@@ -1817,7 +1822,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         tools: [
             {
                 name: "superdesign_generate",
-                description: "Returns design specifications for Claude Code to generate UI designs, wireframes, components, logos, or icons",
+                description: "Returns design specifications for Cline to generate UI designs, wireframes, components, logos, or icons",
                 inputSchema: {
                     type: "object",
                     properties: {
@@ -1974,7 +1979,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     fileList.push(`${baseName}_${i}.${extension}`);
                 }
                 // Build design specifications
-                let specifications = `DESIGN SPECIFICATION FOR CLAUDE CODE:
+                let specifications = `DESIGN SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must generate and save the following design files based on these specifications.
 
@@ -2033,7 +2038,7 @@ Please proceed to create these ${variations} design files now, then automaticall
                 for (let i = 1; i <= variations; i++) {
                     fileList.push(`${baseName}_${i}.${extension}`);
                 }
-                let specifications = `DESIGN ITERATION SPECIFICATION FOR CLAUDE CODE:
+                let specifications = `DESIGN ITERATION SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must iterate on the existing design and save the improved versions.
 
@@ -2080,7 +2085,7 @@ Please proceed to create these ${variations} improved design files now.`;
                 }
                 const superdesignDir = getSuperdeignDirectory();
                 const designSystemDir = path.join(superdesignDir, 'design_system');
-                let specifications = `DESIGN SYSTEM EXTRACTION SPECIFICATION FOR CLAUDE CODE:
+                let specifications = `DESIGN SYSTEM EXTRACTION SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must analyze the image and extract a design system JSON file.
 
@@ -2188,7 +2193,7 @@ Please proceed to analyze the image and create the design system JSON file now.`
                     const galleryPath = path.join(superdesignDir, 'gallery.html');
                     // Generate gallery HTML
                     const galleryHtml = generateGalleryHTML(designFiles, superdesignDir);
-                    let specifications = `GALLERY GENERATION SPECIFICATION FOR CLAUDE CODE:
+                    let specifications = `GALLERY GENERATION SPECIFICATION FOR CLINE:
 
 IMPORTANT: You must create a gallery HTML file to view all designs in a browser.
 
