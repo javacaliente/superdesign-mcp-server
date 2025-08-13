@@ -15,8 +15,13 @@ dist/
 .env.production.local
 
 # Personal configuration files
+mcp-config.json
 cline-mcp-config.json
+
 path_explanation.txt
+javacaliente_superdesign-mcp-server
+IMPLEMENTATION_PLAN.md"
+update_fork_commands
 
 # IDE files
 .vscode/

@@ -13,6 +13,8 @@ import * as path from "path";
 import * as http from "http";
 import * as url from "url";
 
+const activeLiveGalleries = new Map<number, { server: http.Server, superdesignDir: string }>();
+
 const server = new Server(
   {
     name: "superdesign-mcp-server",
@@ -61,6 +63,10 @@ const CleanupSchema = z.object({
 const LiveGallerySchema = z.object({
   workspace_path: z.string().optional().describe("Workspace path (defaults to current directory)"),
   port: z.number().optional().describe("Port for the live gallery server (default: 3000)")
+});
+
+const StopLiveGallerySchema = z.object({
+  port: z.number().describe("Port of the live gallery server to stop")
 });
 
 const CheckFilesSchema = z.object({
@@ -439,6 +445,10 @@ function stopFileWatcher(superdesignDir: string): void {
 // Live gallery server
 function createLiveGalleryServer(superdesignDir: string, port: number = 3000): Promise<string> {
   return new Promise((resolve, reject) => {
+    if (activeLiveGalleries.has(port)) {
+      return reject(new Error(`A server is already running on port ${port}.`));
+    }
+
     const server = http.createServer((req, res) => {
       const parsedUrl = url.parse(req.url || '', true);
       const pathname = parsedUrl.pathname;
@@ -508,11 +518,17 @@ function createLiveGalleryServer(superdesignDir: string, port: number = 3000): P
     });
     
     server.listen(port, () => {
+      activeLiveGalleries.set(port, { server, superdesignDir });
       resolve(`http://localhost:${port}`);
     });
     
     server.on('error', (error) => {
       reject(error);
+    });
+
+    server.on('close', () => {
+      activeLiveGalleries.delete(port);
+      stopFileWatcher(superdesignDir);
     });
   });
 }
@@ -1098,7 +1114,7 @@ Whenever there are UI implementation task, think deeply of the design style firs
 3. Focus on building out the flow of the wireframes
 
 # When asked to extract design system from images:
-Your goal is to extract a generalized and reusable design system from the screenshots provided, **without including specific image content**, so that frontend developers or AI agents can reference the JSON as a style foundation for building consistent UIs.
+Your goal is to extract a generalized and reusable design system from the screenshots provided, **without including specific image content**, so that frontend developers or Ai Agents can reference the JSON as a style foundation for building consistent UIs.
 
 1. Analyze the screenshots provided:
    * Color palette
@@ -1937,7 +1953,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "superdesign_generate",
-        description: "Returns design specifications for Cline to generate UI designs, wireframes, components, logos, or icons",
+        description: "Returns design specifications for the Ai Assistant to generate UI designs, wireframes, components, logos, or icons",
         inputSchema: {
           type: "object",
           properties: {
@@ -2051,6 +2067,17 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
+        name: "superdesign_stop_live_gallery",
+        description: "Stops a running live gallery server",
+        inputSchema: {
+          type: "object",
+          properties: {
+            port: { type: "number", description: "Port of the server to stop" }
+          },
+          required: ["port"],
+        },
+      },
+      {
         name: "superdesign_check_files",
         description: "Check for file changes by comparing current files with a manifest (for gallery refresh integration)",
         inputSchema: {
@@ -2099,7 +2126,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
         
         // Build design specifications
-        let specifications = `DESIGN SPECIFICATION FOR CLINE:
+        let specifications = `DESIGN SPECIFICATION FOR THE Ai Assistant:
 
 IMPORTANT: You must generate and save the following design files based on these specifications.
 
@@ -2165,7 +2192,7 @@ Please proceed to create these ${variations} design files now, then automaticall
           fileList.push(`${baseName}_${i}.${extension}`);
         }
         
-        let specifications = `DESIGN ITERATION SPECIFICATION FOR CLINE:
+        let specifications = `DESIGN ITERATION SPECIFICATION FOR THE Ai Assistant:
 
 IMPORTANT: You must iterate on the existing design and save the improved versions.
 
@@ -2217,7 +2244,7 @@ Please proceed to create these ${variations} improved design files now.`;
         const superdesignDir = getSuperdeignDirectory();
         const designSystemDir = path.join(superdesignDir, 'design_system');
         
-        let specifications = `DESIGN SYSTEM EXTRACTION SPECIFICATION FOR CLINE:
+        let specifications = `DESIGN SYSTEM EXTRACTION SPECIFICATION FOR THE Ai Assistant:
 
 IMPORTANT: You must analyze the image and extract a design system JSON file.
 
@@ -2339,7 +2366,7 @@ Please proceed to analyze the image and create the design system JSON file now.`
           // Generate gallery HTML
           const galleryHtml = generateGalleryHTML(designFiles, superdesignDir);
           
-          let specifications = `GALLERY GENERATION SPECIFICATION FOR CLINE:
+          let specifications = `GALLERY GENERATION SPECIFICATION FOR THE Ai Assistant:
 
 IMPORTANT: You must create a gallery HTML file to view all designs in a browser.
 
@@ -2515,6 +2542,31 @@ Server is now running at: ${serverUrl}`;
         } catch (error: any) {
           return {
             content: [{ type: "text", text: `Error starting live gallery server: ${error.message}` }],
+          };
+        }
+      }
+
+      case "superdesign_stop_live_gallery": {
+        const { port } = StopLiveGallerySchema.parse(args);
+        const gallery = activeLiveGalleries.get(port);
+
+        if (gallery) {
+          return new Promise((resolve) => {
+            gallery.server.close((err) => {
+              if (err) {
+                resolve({
+                  content: [{ type: "text", text: `Error stopping server on port ${port}: ${err.message}` }],
+                });
+              } else {
+                resolve({
+                  content: [{ type: "text", text: `Successfully stopped server on port ${port}` }],
+                });
+              }
+            });
+          });
+        } else {
+          return {
+            content: [{ type: "text", text: `No active server found on port ${port}` }],
           };
         }
       }
